@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenRouter AI Model Search API - テストコンソール</title>
+    <style>
+        :root {
+            --bg-primary: #0d1117;
+            --bg-secondary: #161b22;
+            --bg-tertiary: #21262d;
+            --border-color: #30363d;
+            --text-primary: #c9d1d9;
+            --text-secondary: #8b949e;
+            --accent-blue: #58a6ff;
+            --accent-green: #3fb950;
+            --accent-red: #f85149;
+            --accent-yellow: #d29922;
+            --accent-purple: #a371f7;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+
+        header h1 {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        header p {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            gap: 24px;
+        }
+
+        @media (max-width: 900px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 16px;
+            height: fit-content;
+            position: sticky;
+            top: 20px;
+        }
+
+        .sidebar h2 {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+        }
+
+        .endpoint-list {
+            list-style: none;
+        }
+
+        .endpoint-item {
+            margin-bottom: 4px;
+        }
+
+        .endpoint-btn {
+            width: 100%;
+            text-align: left;
+            background: transparent;
+            border: none;
+            color: var(--text-primary);
+            padding: 10px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: background 0.15s;
+        }
+
+        .endpoint-btn:hover {
+            background: var(--bg-tertiary);
+        }
+
+        .endpoint-btn.active {
+            background: var(--bg-tertiary);
+            border-left: 2px solid var(--accent-blue);
+        }
+
+        .method-badge {
+            font-size: 10px;
+            font-weight: 600;
+            padding: 2px 6px;
+            border-radius: 3px;
+            background: var(--accent-green);
+            color: #000;
+        }
+
+        /* Main Panel */
+        .main-panel {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .panel-header {
+            background: var(--bg-tertiary);
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .panel-header h3 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .panel-header p {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .panel-body {
+            padding: 20px;
+        }
+
+        /* Request Section */
+        .request-section {
+            margin-bottom: 24px;
+        }
+
+        .section-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+        }
+
+        .url-bar {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .url-input {
+            flex: 1;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 10px 14px;
+            color: var(--text-primary);
+            font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+            font-size: 13px;
+        }
+
+        .url-input:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+        }
+
+        .send-btn {
+            background: var(--accent-green);
+            color: #000;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: opacity 0.15s;
+        }
+
+        .send-btn:hover {
+            opacity: 0.9;
+        }
+
+        .send-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Parameters */
+        .params-section {
+            margin-bottom: 20px;
+        }
+
+        .param-row {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+
+        .param-input {
+            flex: 1;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 8px 12px;
+            color: var(--text-primary);
+            font-size: 13px;
+        }
+
+        .param-input:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+        }
+
+        .param-input::placeholder {
+            color: var(--text-secondary);
+        }
+
+        /* Response Section */
+        .response-section {
+            border-top: 1px solid var(--border-color);
+            padding-top: 20px;
+        }
+
+        .response-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .response-meta {
+            display: flex;
+            gap: 16px;
+            font-size: 13px;
+        }
+
+        .status-badge {
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 12px;
+        }
+
+        .status-success {
+            background: rgba(63, 185, 80, 0.2);
+            color: var(--accent-green);
+        }
+
+        .status-error {
+            background: rgba(248, 81, 73, 0.2);
+            color: var(--accent-red);
+        }
+
+        .response-time {
+            color: var(--text-secondary);
+        }
+
+        .response-body {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 16px;
+            max-height: 500px;
+            overflow: auto;
+        }
+
+        .response-body pre {
+            font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+            font-size: 12px;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        /* JSON Syntax Highlighting */
+        .json-key {
+            color: var(--accent-blue);
+        }
+
+        .json-string {
+            color: var(--accent-green);
+        }
+
+        .json-number {
+            color: var(--accent-yellow);
+        }
+
+        .json-boolean {
+            color: var(--accent-purple);
+        }
+
+        .json-null {
+            color: var(--accent-red);
+        }
+
+        /* Loading */
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            color: var(--text-secondary);
+        }
+
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--border-color);
+            border-top-color: var(--accent-blue);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Info Box */
+        .info-box {
+            background: rgba(88, 166, 255, 0.1);
+            border: 1px solid rgba(88, 166, 255, 0.3);
+            border-radius: 6px;
+            padding: 12px 16px;
+            margin-bottom: 16px;
+            font-size: 13px;
+            color: var(--accent-blue);
+        }
+
+        /* Stats Bar */
+        .stats-bar {
+            display: flex;
+            gap: 24px;
+            padding: 12px 20px;
+            background: var(--bg-tertiary);
+            border-top: 1px solid var(--border-color);
+            font-size: 13px;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+        }
+
+        .stat-value {
+            font-weight: 600;
+            color: var(--accent-blue);
+        }
+
+        /* Copy Button */
+        .copy-btn {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .copy-btn:hover {
+            background: var(--bg-primary);
+            color: var(--text-primary);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>OpenRouter AI Model Search API</h1>
+            <p>OpenRouterで利用可能なAIモデルの情報を日本語解説付きで提供するAPI</p>
+        </header>
+
+        <div class="main-content">
+            <aside class="sidebar">
+                <h2>エンドポイント</h2>
+                <ul class="endpoint-list">
+                    <li class="endpoint-item">
+                        <button class="endpoint-btn active" data-endpoint="models" data-url="/api/openrouter/models" data-desc="全てのAIモデルを取得">
+                            <span class="method-badge">GET</span>
+                            モデル一覧
+                        </button>
+                    </li>
+                    <li class="endpoint-item">
+                        <button class="endpoint-btn" data-endpoint="model" data-url="/api/openrouter/models/{modelId}" data-desc="特定のモデルを取得" data-params="modelId">
+                            <span class="method-badge">GET</span>
+                            モデル詳細
+                        </button>
+                    </li>
+                    <li class="endpoint-item">
+                        <button class="endpoint-btn" data-endpoint="search" data-url="/api/openrouter/models/search" data-desc="キーワードでモデルを検索" data-query="q">
+                            <span class="method-badge">GET</span>
+                            モデル検索
+                        </button>
+                    </li>
+                    <li class="endpoint-item">
+                        <button class="endpoint-btn" data-endpoint="provider" data-url="/api/openrouter/models/provider/{provider}" data-desc="プロバイダでフィルタ" data-params="provider">
+                            <span class="method-badge">GET</span>
+                            プロバイダ別
+                        </button>
+                    </li>
+                    <li class="endpoint-item">
+                        <button class="endpoint-btn" data-endpoint="category" data-url="/api/openrouter/models/category/{category}" data-desc="カテゴリでフィルタ" data-params="category">
+                            <span class="method-badge">GET</span>
+                            カテゴリ別
+                        </button>
+                    </li>
+                    <li class="endpoint-item">
+                        <button class="endpoint-btn" data-endpoint="providers" data-url="/api/openrouter/providers" data-desc="プロバイダ一覧とモデル数">
+                            <span class="method-badge">GET</span>
+                            プロバイダ一覧
+                        </button>
+                    </li>
+                    <li class="endpoint-item">
+                        <button class="endpoint-btn" data-endpoint="categories" data-url="/api/openrouter/categories" data-desc="カテゴリ一覧とモデル数">
+                            <span class="method-badge">GET</span>
+                            カテゴリ一覧
+                        </button>
+                    </li>
+                </ul>
+            </aside>
+
+            <main class="main-panel">
+                <div class="panel-header">
+                    <h3 id="endpointTitle">モデル一覧</h3>
+                    <p id="endpointDesc">全てのAIモデルを取得</p>
+                </div>
+
+                <div class="panel-body">
+                    <div class="request-section">
+                        <div class="section-title">リクエスト</div>
+                        
+                        <div class="url-bar">
+                            <input type="text" class="url-input" id="urlInput" value="/api/openrouter/models" readonly>
+                            <button class="send-btn" id="sendBtn" onclick="sendRequest()">送信</button>
+                        </div>
+
+                        <div id="paramsSection" class="params-section" style="display: none;">
+                            <div class="section-title">パラメータ</div>
+                            <div id="paramsContainer"></div>
+                        </div>
+                    </div>
+
+                    <div class="response-section">
+                        <div class="response-header">
+                            <div class="section-title">レスポンス</div>
+                            <div class="response-meta">
+                                <span id="statusBadge" class="status-badge" style="display: none;"></span>
+                                <span id="responseTime" class="response-time"></span>
+                                <button class="copy-btn" onclick="copyResponse()">📋 コピー</button>
+                            </div>
+                        </div>
+                        <div class="response-body" id="responseBody">
+                            <div class="info-box">
+                                エンドポイントを選択して「送信」をクリックするとAPIをテストできます
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stats-bar" id="statsBar" style="display: none;">
+                    <div class="stat-item">
+                        <span class="stat-label">件数:</span>
+                        <span class="stat-value" id="statCount">-</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">USD/JPY:</span>
+                        <span class="stat-value" id="statRate">-</span>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        let currentEndpoint = null;
+        let currentResponse = null;
+
+        // エンドポイントボタンのイベント設定
+        document.querySelectorAll('.endpoint-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                // アクティブ状態を更新
+                document.querySelectorAll('.endpoint-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+
+                // エンドポイント情報を取得
+                const endpoint = btn.dataset.endpoint;
+                const url = btn.dataset.url;
+                const desc = btn.dataset.desc;
+                const params = btn.dataset.params;
+                const query = btn.dataset.query;
+
+                currentEndpoint = { endpoint, url, params, query };
+
+                // UI更新
+                document.getElementById('endpointTitle').textContent = btn.textContent.trim();
+                document.getElementById('endpointDesc').textContent = desc;
+                document.getElementById('urlInput').value = url;
+
+                // パラメータセクション
+                const paramsSection = document.getElementById('paramsSection');
+                const paramsContainer = document.getElementById('paramsContainer');
+                paramsContainer.innerHTML = '';
+
+                if (params) {
+                    paramsSection.style.display = 'block';
+                    const paramList = params.split(',');
+                    paramList.forEach(param => {
+                        const placeholder = getPlaceholder(param);
+                        paramsContainer.innerHTML += `
+                            <div class="param-row">
+                                <input type="text" class="param-input" id="param_${param}" 
+                                       placeholder="${param}" value="${placeholder}">
+                            </div>
+                        `;
+                    });
+                } else if (query) {
+                    paramsSection.style.display = 'block';
+                    paramsContainer.innerHTML = `
+                        <div class="param-row">
+                            <input type="text" class="param-input" id="query_${query}" 
+                                   placeholder="検索キーワード" value="claude">
+                        </div>
+                    `;
+                } else {
+                    paramsSection.style.display = 'none';
+                }
+
+                updateUrl();
+            });
+        });
+
+        // プレースホルダー値を取得
+        function getPlaceholder(param) {
+            const placeholders = {
+                'modelId': 'openai/gpt-4o',
+                'provider': 'openai',
+                'category': '推論強化モデル'
+            };
+            return placeholders[param] || '';
+        }
+
+        // URL更新
+        function updateUrl() {
+            if (!currentEndpoint) return;
+
+            let url = currentEndpoint.url;
+
+            if (currentEndpoint.params) {
+                const paramList = currentEndpoint.params.split(',');
+                paramList.forEach(param => {
+                    const input = document.getElementById(`param_${param}`);
+                    if (input && input.value) {
+                        url = url.replace(`{${param}}`, encodeURIComponent(input.value));
+                    }
+                });
+            }
+
+            if (currentEndpoint.query) {
+                const input = document.getElementById(`query_${currentEndpoint.query}`);
+                if (input && input.value) {
+                    url += `?${currentEndpoint.query}=${encodeURIComponent(input.value)}`;
+                }
+            }
+
+            document.getElementById('urlInput').value = url;
+        }
+
+        // パラメータ入力時にURL更新
+        document.getElementById('paramsContainer').addEventListener('input', updateUrl);
+
+        // リクエスト送信
+        async function sendRequest() {
+            const url = document.getElementById('urlInput').value;
+            const responseBody = document.getElementById('responseBody');
+            const sendBtn = document.getElementById('sendBtn');
+            const statusBadge = document.getElementById('statusBadge');
+            const responseTime = document.getElementById('responseTime');
+            const statsBar = document.getElementById('statsBar');
+
+            // ローディング表示
+            sendBtn.disabled = true;
+            sendBtn.textContent = '送信中...';
+            responseBody.innerHTML = '<div class="loading"><div class="spinner"></div>リクエスト中...</div>';
+            statusBadge.style.display = 'none';
+            responseTime.textContent = '';
+            statsBar.style.display = 'none';
+
+            const startTime = performance.now();
+
+            try {
+                const response = await fetch(url);
+                const endTime = performance.now();
+                const duration = Math.round(endTime - startTime);
+
+                const data = await response.json();
+                currentResponse = data;
+
+                // ステータス表示
+                statusBadge.style.display = 'inline-block';
+                statusBadge.textContent = `${response.status} ${response.statusText}`;
+                statusBadge.className = `status-badge ${response.ok ? 'status-success' : 'status-error'}`;
+                responseTime.textContent = `${duration}ms`;
+
+                // レスポンス表示
+                responseBody.innerHTML = `<pre>${syntaxHighlight(JSON.stringify(data, null, 2))}</pre>`;
+
+                // 統計表示
+                if (data.count !== undefined || data.usd_jpy_rate !== undefined) {
+                    statsBar.style.display = 'flex';
+                    document.getElementById('statCount').textContent = data.count ?? '-';
+                    document.getElementById('statRate').textContent = data.usd_jpy_rate ? `¥${data.usd_jpy_rate.toFixed(2)}` : '-';
+                }
+
+            } catch (error) {
+                statusBadge.style.display = 'inline-block';
+                statusBadge.textContent = 'Error';
+                statusBadge.className = 'status-badge status-error';
+                responseBody.innerHTML = `<pre style="color: var(--accent-red);">Error: ${error.message}</pre>`;
+            }
+
+            sendBtn.disabled = false;
+            sendBtn.textContent = '送信';
+        }
+
+        // JSON構文ハイライト
+        function syntaxHighlight(json) {
+            json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
+                let cls = 'json-number';
+                if (/^"/.test(match)) {
+                    if (/:$/.test(match)) {
+                        cls = 'json-key';
+                    } else {
+                        cls = 'json-string';
+                    }
+                } else if (/true|false/.test(match)) {
+                    cls = 'json-boolean';
+                } else if (/null/.test(match)) {
+                    cls = 'json-null';
+                }
+                return '<span class="' + cls + '">' + match + '</span>';
+            });
+        }
+
+        // レスポンスをコピー
+        function copyResponse() {
+            if (currentResponse) {
+                navigator.clipboard.writeText(JSON.stringify(currentResponse, null, 2))
+                    .then(() => {
+                        const btn = document.querySelector('.copy-btn');
+                        btn.textContent = '✓ コピー完了';
+                        setTimeout(() => {
+                            btn.textContent = '📋 コピー';
+                        }, 2000);
+                    });
+            }
+        }
+
+        // 初期化
+        currentEndpoint = {
+            endpoint: 'models',
+            url: '/api/openrouter/models',
+            params: null,
+            query: null
+        };
+    </script>
+</body>
+</html>
