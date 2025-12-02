@@ -412,43 +412,43 @@
                 <h2>エンドポイント</h2>
                 <ul class="endpoint-list">
                     <li class="endpoint-item">
-                        <button class="endpoint-btn active" data-endpoint="models" data-url="/api/api/openrouter/models" data-desc="全てのAIモデルを取得">
+                        <button class="endpoint-btn active" data-endpoint="models" data-url="/api/openrouter/models" data-desc="全てのAIモデルを取得">
                             <span class="method-badge">GET</span>
                             モデル一覧
                         </button>
                     </li>
                     <li class="endpoint-item">
-                        <button class="endpoint-btn" data-endpoint="model" data-url="/api/api/openrouter/models/{modelId}" data-desc="特定のモデルを取得" data-params="modelId">
+                        <button class="endpoint-btn" data-endpoint="model" data-url="/api/openrouter/models/show" data-desc="特定のモデルを取得" data-query="id">
                             <span class="method-badge">GET</span>
                             モデル詳細
                         </button>
                     </li>
                     <li class="endpoint-item">
-                        <button class="endpoint-btn" data-endpoint="search" data-url="/api/api/openrouter/models/search" data-desc="キーワードでモデルを検索" data-query="q">
+                        <button class="endpoint-btn" data-endpoint="search" data-url="/api/openrouter/models/search" data-desc="キーワードでモデルを検索" data-query="q">
                             <span class="method-badge">GET</span>
                             モデル検索
                         </button>
                     </li>
                     <li class="endpoint-item">
-                        <button class="endpoint-btn" data-endpoint="provider" data-url="/api/api/openrouter/models/provider/{provider}" data-desc="プロバイダでフィルタ" data-params="provider">
+                        <button class="endpoint-btn" data-endpoint="provider" data-url="/api/openrouter/models/provider/{provider}" data-desc="プロバイダでフィルタ" data-params="provider">
                             <span class="method-badge">GET</span>
                             プロバイダ別
                         </button>
                     </li>
                     <li class="endpoint-item">
-                        <button class="endpoint-btn" data-endpoint="category" data-url="/api/api/openrouter/models/category/{category}" data-desc="カテゴリでフィルタ" data-params="category">
+                        <button class="endpoint-btn" data-endpoint="category" data-url="/api/openrouter/models/category/{category}" data-desc="カテゴリでフィルタ" data-params="category">
                             <span class="method-badge">GET</span>
                             カテゴリ別
                         </button>
                     </li>
                     <li class="endpoint-item">
-                        <button class="endpoint-btn" data-endpoint="providers" data-url="/api/api/openrouter/providers" data-desc="プロバイダ一覧とモデル数">
+                        <button class="endpoint-btn" data-endpoint="providers" data-url="/api/openrouter/providers" data-desc="プロバイダ一覧とモデル数">
                             <span class="method-badge">GET</span>
                             プロバイダ一覧
                         </button>
                     </li>
                     <li class="endpoint-item">
-                        <button class="endpoint-btn" data-endpoint="categories" data-url="/api/api/openrouter/categories" data-desc="カテゴリ一覧とモデル数">
+                        <button class="endpoint-btn" data-endpoint="categories" data-url="/api/openrouter/categories" data-desc="カテゴリ一覧とモデル数">
                             <span class="method-badge">GET</span>
                             カテゴリ一覧
                         </button>
@@ -467,7 +467,7 @@
                         <div class="section-title">リクエスト</div>
                         
                         <div class="url-bar">
-                            <input type="text" class="url-input" id="urlInput" value="/api/api/openrouter/models" readonly>
+                            <input type="text" class="url-input" id="urlInput" value="/api/openrouter/models" readonly>
                             <button class="send-btn" id="sendBtn" onclick="sendRequest()">送信</button>
                         </div>
 
@@ -571,7 +571,8 @@
             const placeholders = {
                 'modelId': 'openai/gpt-4o',
                 'provider': 'openai',
-                'category': '推論強化モデル'
+                'category': '推論強化モデル',
+                'id': 'openai/gpt-4o'
             };
             return placeholders[param] || '';
         }
@@ -696,7 +697,7 @@
         // 初期化
         currentEndpoint = {
             endpoint: 'models',
-            url: '/api/api/openrouter/models',
+            url: '/api/openrouter/models',
             params: null,
             query: null
         };

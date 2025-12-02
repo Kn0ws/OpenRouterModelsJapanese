@@ -26,8 +26,8 @@ $routes->group('api', ['namespace' => 'App\Controllers\API'], static function ($
         // カテゴリでフィルタ
         $routes->get('models/category/(.+)', 'OpenRouterController::byCategory/$1');
         
-        // 特定のモデル取得（スラッシュを含むモデルIDに対応）
-        $routes->get('models/(.+)', 'OpenRouterController::show/$1');
+        // 特定のモデル取得（クエリパラメータ方式: ?id=openai/gpt-4o）
+        $routes->get('models/show', 'OpenRouterController::show');
         
         // プロバイダ一覧
         $routes->get('providers', 'OpenRouterController::providers');

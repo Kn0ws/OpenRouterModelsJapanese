@@ -112,21 +112,15 @@ class OpenRouterController extends BaseController
 
     /**
      * 特定のモデルを取得
-     * GET /api/openrouter/models/{modelId}
+     * GET /api/openrouter/models/show?id={modelId}
      */
-    public function show(?string $modelId = null)
+    public function show()
     {
-        // URIセグメントから直接取得（スラッシュを含むパス対応）
-        $uri = service('uri');
-        $segments = $uri->getSegments();
-        
-        // /api/openrouter/models/{modelId} なので、4番目以降を結合
-        if (count($segments) >= 4) {
-            $modelId = implode('/', array_slice($segments, 3));
-        }
+        // クエリパラメータからモデルIDを取得
+        $modelId = $this->request->getGet('id');
         
         if (empty($modelId)) {
-            return $this->failNotFound('Model ID is required');
+            return $this->failNotFound('Model ID is required. Use ?id=provider/model-name');
         }
 
         // URLエンコードされたモデルIDをデコード
