@@ -105,7 +105,7 @@ class OpenRouterService
         $response = $this->client->request('POST', $this->chatUrl, [
             'headers' => $headers,
             'json'    => $payload,
-            'timeout' => 60,
+            'timeout' => 120,
         ]);
 
         if ($response->getStatusCode() !== 200) {
@@ -253,8 +253,8 @@ class OpenRouterService
         $ctx = $model['context_length'] ?? null;
 
         $systemPrompt = 'あなたはAIモデル一覧表を作るための日本語ライター。' .
-            'エンジニア向けに、事実のみを短く、です・ます調を使わずに説明を書く。' .
-            '1〜2文程度で、用途と特徴がわかる要約だけを書く。';
+            'エンジニア向けに、事実のみを、です・ます調を使わずに説明を書く。' .
+            '用途と特徴が詳細に分かるよう、長くなっても良いので正確に書く。';
 
         $infoLines = [
             "Model name: {$name}",
@@ -274,12 +274,12 @@ class OpenRouterService
         }
 
         $userPrompt = "次のモデル情報を読んで、このモデルがどのような用途・特徴を持つかを、" .
-            "日本語で1〜2文の短い説明として出力して。\n\n" .
+            "日本語の説明分として出力して。\n\n" .
             implode("\n", $infoLines) .
             "\n\n条件:\n" .
             "- 口調は説明文。です・ます調は使わない。\n" .
             "- 主観的な評価や推測は書かない。\n" .
-            "- モデルの用途や特徴が一目でわかるようにする。\n";
+            "- モデルの用途や特徴が明確にわかるようにする。\n";
 
         $messages = [
             ['role' => 'system', 'content' => $systemPrompt],
